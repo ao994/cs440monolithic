@@ -17,39 +17,6 @@ def get_db_connection():
     connection.row_factory = sqlite3.Row
     return connection
 
-@app.route('/')
-def index():
-    return render_template('index.html')
-
-@app.route('/books')
-def books():
-    connection = get_db_connection()
-    books = connection.execute('SELECT * FROM books').fetchall()
-    connection.close()
-    return render_template('books.html', books=books)
-
-@app.route('/books/<int:book_id>')
-def book_details(book_id):
-    connection = get_db_connection()
-    book = connection.execute('SELECT * FROM books WHERE id = ?', (book_id,)).fetchone()
-    reviews = connection.execute('SELECT * FROM reviews WHERE book_id = ?', (book_id,)).fetchall()
-    connection.close()
-    return render_template('reviews.html', book=book, reviews=reviews)
-
-@app.route('/books/add', methods=['POST'])
-def add_book():
-    title = request.form['title']
-    author = request.form['author']
-    year = request.form['year']
-    
-    connection = get_db_connection()
-    connection.execute('INSERT INTO books (title, author, year) VALUES (?, ?, ?)',
-                (title, author, year))
-    connection.commit()
-    connection.close()
-    flash('Book added successfully!')
-    return redirect(url_for('books'))
-
 @app.route('/reviews/add', methods=['POST'])
 def add_review():
     book_id = request.form['book_id']
@@ -65,13 +32,6 @@ def add_review():
     connection.close()
     flash('Review added successfully!')
     return redirect(url_for('book_details', book_id=book_id))
-
-@app.route('/api/books')
-def api_books():
-    connection = get_db_connection()
-    books = connection.execute('SELECT * FROM books').fetchall()
-    connection.close()
-    return jsonify([dict(book) for book in books])
 
 @app.route('/api/reviews/<int:book_id>')
 def api_reviews(book_id):
