@@ -11,15 +11,9 @@ COPY . /app
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Expose the port the app runs on
-EXPOSE 5000
+EXPOSE 5002
+# Set the environment variable for Flask to run in production
+ENV FLASK_ENV=production
 
-# Define environment variable for Flask
-ENV FLASK_APP=app.py
-ENV FLASK_RUN_HOST=0.0.0.0
-
-# Run the Flask app
-CMD ["flask", "run"]
-
-#in reviews folder, on the command line, run "docker build -t reviews ."
-#then run "docker run -p 127.0.0.1:5000:5000 reviews"
-#in browser, go to localhost:5000 to see website
+# Define the command to run the Flask application
+CMD ["python", "review_service.py"]

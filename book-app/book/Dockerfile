@@ -11,15 +11,10 @@ COPY . /app
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Expose the port the app runs on
-EXPOSE 5000
+EXPOSE 5001
 
-# Define environment variable for Flask
-ENV FLASK_APP=app.py
-ENV FLASK_RUN_HOST=0.0.0.0
+# Set the environment variable for Flask to run in production
+ENV FLASK_ENV=production
 
-# Run the Flask app
-CMD ["flask", "run"]
-
-#in book folder, on the command line, run "docker build -t book ."
-#then run "docker run -p 127.0.0.1:5000:5000 book"
-#in browser, go to localhost:5000 to see website
+# Define the command to run the Flask application
+CMD ["python", "book_service.py"]
