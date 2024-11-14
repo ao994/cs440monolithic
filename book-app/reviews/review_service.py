@@ -4,6 +4,7 @@ from datetime import datetime
 
 app = Flask(__name__)
 app.secret_key = 'your_secret_key_here'  # Required for flash messages
+BOOK_SERVICE_URL = 'http://nginx:5000/books'
 
 def init_db():
     connection = get_db_connection()
@@ -16,6 +17,11 @@ def get_db_connection():
     connection = sqlite3.connect('database.db')
     connection.row_factory = sqlite3.Row
     return connection
+
+@app.route('/redirect_to_books')
+def redirect_to_books():
+    # Redirect to the books microservice
+    return redirect(BOOK_SERVICE_URL)
 
 @app.route('/reviews/add', methods=['POST'])
 def add_review():
@@ -33,10 +39,10 @@ def add_review():
     flash('Review added successfully!')
     return redirect(url_for('book_details', book_id=book_id))
 
-@app.route('/api/reviews/<int:book_id>')
+@app.route('/reviews/<int:book_id>/api')
 def api_reviews(book_id):
     connection = get_db_connection()
-    reviews = connection.execute('SELECT * FROM reviews WHERE book_id = ?', (book_id,)).fetchall()
+    reviews = connection.execute('SELECT * FROM reviews WHERE book_id = ?', (book_id)).fetchall()
     connection.close()
     return jsonify([dict(review) for review in reviews])
 

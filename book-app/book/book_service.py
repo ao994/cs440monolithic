@@ -1,7 +1,7 @@
 from flask import Flask, render_template, request, redirect, url_for, flash, jsonify
 import sqlite3
 from datetime import datetime
-
+import requests
 
 app = Flask(__name__)
 app.secret_key = 'your_secret_key_here'  # Required for flash messages
@@ -19,7 +19,7 @@ def get_db_connection():
     connection.row_factory = sqlite3.Row
     return connection
 
-@app.route('/')
+@app.route('/home')
 def index():
     return render_template('index.html')
 
@@ -37,7 +37,7 @@ def book_details(book_id):
     connection.close()
     
     # Request reviews from the Review Microservice
-    reviews = request.get(f"{REVIEW_SERVICE_URL}/{book_id}").json()
+    reviews = requests.get(f"{REVIEW_SERVICE_URL}/{book_id}/api").json()
     
     return render_template('reviews.html', book=book, reviews=reviews)
 
@@ -56,7 +56,7 @@ def add_book():
     flash('Book added successfully!')
     return redirect(url_for('books'))
 
-@app.route('/api/books')
+@app.route('/books/api')
 def api_books():
     connection = get_db_connection()
     books = connection.execute('SELECT * FROM books').fetchall()
